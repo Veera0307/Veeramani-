@@ -1,0 +1,101 @@
+05.17 10:29 AM
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Search Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 200px;
+            padding: 5px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        input[type="submit"] {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #crime-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #crime-list li {
+            background-color: #fff;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 3px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Crime Search</h1>
+    <form id="crime-form">
+        <label for="zipcode">Enter your ZIP code:</label><br>
+        <input type="text" id="zipcode" name="zipcode" placeholder="e.g., 70802" required><br><br>
+        <label for="date">Enter a date (YYYY-MM-DD):</label><br>
+        <input type="text" id="date" name="date" placeholder="e.g., 2023-05-01" required><br><br>
+        <input type="submit" value="Search">
+    </form>
+
+    <h2>Crime Incidents:</h2>
+    <ul id="crime-list"></ul>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#crime-form').submit(function(event) {
+                event.preventDefault();
+
+                var zipcode = $('#zipcode').val();
+                var date = $('#date').val();
+                var apiUrl = `https://data.brla.gov/resource/5rji-ddnu.json?$where=zip='${zipcode}' AND offense_date='${date}T00:00:00'`;
+
+                $.getJSON(apiUrl, function(data) {
+                    if (data.length > 0) {
+                        var crimeList = '';
+                        $.each(data, function(index, crime) {
+                            crimeList += `<li>${crime.crime}</li>`;
+                        });
+                        $('#crime-list').html(crimeList);
+                    } else {
+                        $('#crime-list').html('<li>No crimes found for the specified ZIP code and date.</li>');
+                    }
+                }).fail(function() {
+                    $('#crime-list').html('<li>Error retrieving data. Please try again later.</li>');
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
